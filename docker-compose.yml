@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/local/Dockerfile
+    container_name: app-my-laravel-app
+    tty: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./src:/var/www
+    networks:
+      - my-laravel-app
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-my-laravel-app
+    ports:
+      - "8000:80"
+    depends_on:
+      - app
+    volumes:
+      - ./src:/var/www
+      - ./docker/local/config/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - my-laravel-app
+
+networks:
+  my-laravel-app:
+    driver: bridge
